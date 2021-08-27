@@ -1,5 +1,6 @@
 const express = require("express")
 const bodyParse = require("body-parser")
+const https = require("https")
 const mongoose = require("mongoose")
 const validator = require("validator")
 mongoose.connect("mongodb://localhost:27017/Deakin", { useNewUrlParser: true })
@@ -100,6 +101,37 @@ app.post('/', (req, res) => {
         if (err) { console.log(err) }
         else { console.log("Successfull!") }
     })
+    
+    const data = {
+        members:[{
+            email_address: email,
+            status : "subscribed",
+            merge_fields:{
+                FNAME:fname,
+                LNAME:lname
+            }
+        }]
+    }
+    jsonData = JSON.stringify(data)
+    
+    const apikey="420e7e94f1749cd77058f9ba2770594e-us5"
+    const url= "https://us5.api.mailchimp.com/3.0/lists/29e7bbe168"
+    const options={
+        method:"POST",
+        auth:"azi:420e7e94f1749cd77058f9ba2770594e-us5"
+    }
+
+
+    const request = https.request(url, options , (response)=>{
+
+        response.on("data", (data)=> {
+            console.log(JSON.parse(data))
+        })
+
+    })
+
+    request.write(jsonData)
+    request.end()
 
 })
 
